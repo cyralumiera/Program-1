@@ -1,0 +1,460 @@
+{
+  "case_id": "case_01",
+  "title": "Pencurian di Perpustakaan Kota",
+  "description": "Buku kuno sejarah kota hilang semalam sebelum pameran besar. Anda harus menemukan siapa pelakunya melalui investigasi, wawancara, dan analisis bukti.",
+  "start_location": "perpustakaan_utama",
+  
+  "locations": {
+    "perpustakaan_utama": {
+      "name": "Ruang Utama Perpustakaan",
+      "description": "Ruang baca utama perpustakaan yang luas dengan rak-rak buku tinggi. Pagi ini kelihatan sedikit berantakan. Ada meja depan dimana penjaga duduk, dan beberapa pintu menuju ruangan lain.",
+      "scenes": ["scene_first_arrival", "scene_search_main_room"],
+      "npcs": ["kepala_perpustakaan", "penjaga_malam"],
+      "exits": {
+        "archive": "Menuju Ruang Arsip",
+        "office": "Menuju Kantor Kepala Perpustakaan"
+      }
+    },
+    "ruang_arsip": {
+      "name": "Ruang Arsip",
+      "description": "Ruang khusus dengan rak-rak logam berisi dokumen dan buku kuno. Suasana sejuk dan terawat. Terlihat ada beberapa laci yang terbuka.",
+      "scenes": ["scene_archive_first"],
+      "npcs": ["mahasiswa_peneliti"],
+      "exits": {
+        "main": "Kembali ke Perpustakaan Utama"
+      }
+    },
+    "kantor_kepala": {
+      "name": "Kantor Kepala Perpustakaan",
+      "description": "Kantor yang elegan dengan meja kerja besar, rak buku pribadi, dan beberapa foto penghargaan di dinding. Meja tampak rapi.",
+      "scenes": ["scene_office_search"],
+      "npcs": ["kepala_perpustakaan"],
+      "exits": {
+        "main": "Kembali ke Perpustakaan Utama"
+      }
+    }
+  },
+  
+  "characters": {
+    "kepala_perpustakaan": {
+      "name": "Ibu Sita Dewi",
+      "role": "Kepala Perpustakaan",
+      "description": "Wanita berusia 50-an, profesional, sedikit cemas",
+      "first_dialogue": "kepala_hello",
+      "dialogues": {
+        "kepala_hello": {
+          "text": "Ibu Sita: Terima kasih sudah datang, Detektif. Buku kuno kami yang paling berharga hilang malam hari. Ini buku sejarah kota yang akan dipamerkan hari ini!",
+          "choices": [
+            {"text": "Kapan Anda terakhir melihat bukunya?", "next": "kepala_when"},
+            {"text": "Siapa saja yang punya akses ke ruang arsip?", "next": "kepala_access"}
+          ]
+        },
+        "kepala_when": {
+          "text": "Ibu Sita: Saya mengeceknya kemarin sore sebelum pulang, sekitar pukul 4 sore. Pagi ini ketika Tim akan mengambilnya untuk pameran, buku itu sudah hilang!",
+          "choices": [
+            {"text": "Ada yang mencurigakan?", "next": "kepala_access"},
+            {"text": "Saya perlu melihat tempat penyimpanan bukunya", "next": "kepala_end_dialogue"}
+          ]
+        },
+        "kepala_access": {
+          "text": "Ibu Sita: Hanya saya, penjaga malam, dan mahasiswa peneliti yang boleh masuk arsip. Semua punya kunci akses sendiri.",
+          "question": "q_alibi_definition",
+          "on_correct": {
+            "message": "Ibu Sita melihat Anda mengangguk mengerti. Dia menjadi sedikit lebih terbuka.",
+            "flags": {"kepala_trust": true},
+            "evidence": ["catatan_kepala"]
+          },
+          "on_incorrect": {
+            "message": "Ibu Sita tampak ragu dengan pemahaman Anda.",
+            "flags": {"kepala_trust": false}
+          },
+          "choices": []
+        },
+        "kepala_end_dialogue": {
+          "text": "Ibu Sita: Silahkan, ruang arsip ada di sebelah timur. Mohon hati-hati dengan dokumen-dokumen berharga kami.",
+          "choices": []
+        }
+      }
+    },
+    
+    "penjaga_malam": {
+      "name": "Pak Ahmad",
+      "role": "Penjaga Malam",
+      "description": "Pria berusia 60-an, terlihat gelisah dan lelah",
+      "first_dialogue": "penjaga_hello",
+      "dialogues": {
+        "penjaga_hello": {
+          "text": "Pak Ahmad: (terlihat gugup) Eh, Detektif... Saya tidak tahu apa yang terjadi. Saya bertugas malam ini dari jam 8 sampai jam 5 pagi...",
+          "choices": [
+            {"text": "Anda melihat ada orang lain di perpustakaan?", "next": "penjaga_visit"},
+            {"text": "Bagaimana dengan ruang arsip?", "next": "penjaga_archive"}
+          ]
+        },
+        "penjaga_visit": {
+          "text": "Pak Ahmad: (menggigit bibir) Ada... ada mahasiswa perempuan yang datang sekitar jam 10 malam. Dia bilang mau riset untuk tugas akhir.",
+          "choices": [
+            {"text": "Apakah dia sering berkunjung malam?", "next": "penjaga_habit"},
+            {"text": "Anda izinkan dia masuk?", "next": "penjaga_decision"}
+          ]
+        },
+        "penjaga_habit": {
+          "text": "Pak Ahmad: Cukup sering... mungkin 2-3 kali seminggu. Tapi biasanya dia pulang jam 11 atau 12. Tapi malam ini dia lama...",
+          "question": "q_jam_jaga",
+          "on_correct": {
+            "message": "Pak Ahmad terlihat lega. Dia menunjukkan buku catatan jam jaga.",
+            "flags": {"penjaga_cooperative": true},
+            "evidence": ["catatan_jam_jaga"]
+          },
+          "on_incorrect": {
+            "message": "Pak Ahmad menjadi defensif.",
+            "flags": {"penjaga_cooperative": false}
+          },
+          "choices": []
+        },
+        "penjaga_decision": {
+          "text": "Pak Ahmad: Ya, saya izinkan. Dia terlihat sebagai mahasiswa yang baik-baik saja. Saya tidak curiga dengannya.",
+          "choices": [
+            {"text": "Terima kasih informasinya", "next": "penjaga_end"}
+          ]
+        },
+        "penjaga_archive": {
+          "text": "Pak Ahmad: Ruang arsip dikunci. Dia membuka pintu dengan kunci pribadi yang diberikan kepala perpustakaan.",
+          "choices": []
+        },
+        "penjaga_end": {
+          "text": "Pak Ahmad: Saya harap saya bisa membantu Detektif...",
+          "choices": []
+        }
+      }
+    },
+    
+    "mahasiswa_peneliti": {
+      "name": "Rani Wijaya",
+      "role": "Mahasiswa Peneliti",
+      "description": "Wanita muda, sekitar 22 tahun, terlihat cerdas tapi tegang",
+      "first_dialogue": "rani_hello_first",
+      "dialogues": {
+        "rani_hello_first": {
+          "text": "Rani: (terkejut) Oh! Anda... Anda pasti detektif yang disebutkan penjaga tadi?",
+          "choices": [
+            {"text": "Ya, saya ingin tanya tentang malam kemarin", "next": "rani_malam"},
+            {"text": "Anda sering bekerja malam-malam?", "next": "rani_habit"}
+          ]
+        },
+        "rani_malam": {
+          "text": "Rani: (gugup) M-malam kemarin? Saya... saya hanya sedang riset untuk skripsi saya. Buku-buku sejarah itu penting untuk penelitian saya.",
+          "question": "q_logika_waktu",
+          "on_correct": {
+            "message": "Rani menjadi lebih tenang setelah Anda bertanya dengan logis.",
+            "flags": {"rani_opened_up": true},
+            "evidence": ["pernyataan_rani_jelas"]
+          },
+          "on_incorrect": {
+            "message": "Rani semakin gugup dan defensif.",
+            "flags": {"rani_opened_up": false},
+            "evidence": []
+          },
+          "choices": []
+        },
+        "rani_habit": {
+          "text": "Rani: Ya, saya sering bekerja malam karena pagi saya ada kelas. Perpustakaan lebih sepi di malam hari, jadi saya bisa fokus belajar.",
+          "choices": [
+            {"text": "Apakah Anda tahu tentang buku yang hilang?", "next": "rani_buku"}
+          ]
+        },
+        "rani_buku": {
+          "text": "Rani: (mata membesar) Buku... yang hilang? Tidak, saya tidak tahu. Saya hanya membaca buku, tidak mengambilnya!",
+          "choices": []
+        }
+      }
+    }
+  },
+  
+  "questions": {
+    "q_alibi_definition": {
+      "type": "short_answer",
+      "text": "Apa arti kata 'alibi'?",
+      "correct_answer": "bukti kehadiran di tempat lain pada waktu kejadian",
+      "hint": "Dalam kasus kriminal, ini adalah pembuktian bahwa seseorang ada di tempat lain",
+      "on_correct": {
+        "message": "Jawaban Anda benar! Alibi adalah pembuktian kehadiran di tempat lain.",
+        "evidence": ["catatan_kepala"],
+        "flags": {"kepala_trust": true}
+      },
+      "on_incorrect": {
+        "message": "Jawaban salah. Alibi adalah pembuktian kehadiran di tempat lain saat kejadian.",
+        "flags": {}
+      }
+    },
+    
+    "q_jam_jaga": {
+      "type": "multiple_choice",
+      "text": "Jika penjaga malam bertugas jam 8 malam sampai 5 pagi, dan mahasiswa datang jam 10 malam, siapa yang pasti melihat mahasiswa itu?",
+      "options": [
+        "Hanya kepala perpustakaan",
+        "Hanya penjaga malam",
+        "Penjaga malam dan kepala perpustakaan",
+        "Tidak ada yang bisa memastikan"
+      ],
+      "correct_answer": "Hanya penjaga malam",
+      "on_correct": {
+        "message": "Benar! Penjaga malam yang bertugas adalah satu-satunya yang pasti melihatnya.",
+        "evidence": ["catatan_jam_jaga", "alibi_penjaga"],
+        "flags": {"penjaga_cooperative": true}
+      },
+      "on_incorrect": {
+        "message": "Salah. Pertimbangkan siapa yang berada di perpustakaan pada waktu itu.",
+        "flags": {}
+      }
+    },
+    
+    "q_logika_waktu": {
+      "type": "logic",
+      "text": "Jika bukunya hilang pagi ini dan penjaga melihat mahasiswa datang jam 10 malam, kapan kemungkinan besar bukunya diambil?",
+      "options": [
+        "Pagi hari sebelum kepala perpustakaan tiba",
+        "Sore hari saat kepala perpustakaan pulang",
+        "Malam hari antara jam 8 dan 5 pagi",
+        "Tidak bisa ditentukan"
+      ],
+      "correct_answer": "Malam hari antara jam 8 dan 5 pagi",
+      "on_correct": {
+        "message": "Logika Anda tepat! Itu mempersempit waktu kemungkinan pencurian.",
+        "evidence": ["timeline_kejadian"],
+        "flags": {"timeline_established": true}
+      },
+      "on_incorrect": {
+        "message": "Pertimbangkan lagi berdasarkan informasi jam jaga penjaga.",
+        "flags": {}
+      }
+    },
+
+    "q_penjumlahan": {
+      "type": "multiple_choice",
+      "text": "Kepala perpustakaan memiliki 5 buku sejarah di koleksi pribadi dan membeli 3 buku lagi. Berapa total buku yang dimilikinya sekarang?",
+      "options": [
+        "7 buku",
+        "8 buku",
+        "9 buku",
+        "10 buku"
+      ],
+      "correct_answer": "8 buku",
+      "on_correct": {
+        "message": "Benar! 5 + 3 = 8. Anda pandai berhitung.",
+        "evidence": ["bukti_perhitungan"],
+        "flags": {"math_penjumlahan": true}
+      },
+      "on_incorrect": {
+        "message": "Salah. Coba hitung lagi: 5 + 3 = ?",
+        "flags": {}
+      }
+    },
+
+    "q_pengurangan": {
+      "type": "multiple_choice",
+      "text": "Perpustakaan memiliki 25 buku kuno. 8 buku dikatalogkan oleh mahasiswa untuk penelitian. Berapa buku yang belum dikatalogkan?",
+      "options": [
+        "15 buku",
+        "16 buku",
+        "17 buku",
+        "18 buku"
+      ],
+      "correct_answer": "17 buku",
+      "on_correct": {
+        "message": "Benar! 25 - 8 = 17. Perhitungan Anda akurat.",
+        "evidence": ["bukti_pengurangan"],
+        "flags": {"math_pengurangan": true}
+      },
+      "on_incorrect": {
+        "message": "Salah. Coba hitung lagi: 25 - 8 = ?",
+        "flags": {}
+      }
+    },
+
+    "q_pembagian": {
+      "type": "multiple_choice",
+      "text": "Penjaga malam menemukan 24 halaman buku yang tersebar di lantai. Dia membaginya menjadi 6 tumpukan sama besar. Berapa halaman di setiap tumpukan?",
+      "options": [
+        "3 halaman",
+        "4 halaman",
+        "5 halaman",
+        "6 halaman"
+      ],
+      "correct_answer": "4 halaman",
+      "on_correct": {
+        "message": "Benar! 24 ÷ 6 = 4. Anda mahir dalam pembagian.",
+        "evidence": ["bukti_pembagian"],
+        "flags": {"math_pembagian": true}
+      },
+      "on_incorrect": {
+        "message": "Salah. Coba hitung lagi: 24 ÷ 6 = ?",
+        "flags": {}
+      }
+    }
+  },
+  
+  "clues": {
+    "catatan_kepala": {
+      "name": "Catatan Kepala Perpustakaan",
+      "description": "Catatan yang mencatat pemeriksaan buku terakhir pada pukul 4 sore",
+      "category": "document",
+      "unlock_requirement": {
+        "question_id": "q_alibi_definition",
+        "required_correct": true
+      }
+    },
+    "catatan_jam_jaga": {
+      "name": "Catatan Jam Jaga Penjaga",
+      "description": "Catatan waktu kunjungan mahasiswa dan pergerakan penjaga",
+      "category": "document",
+      "unlock_requirement": {
+        "question_id": "q_jam_jaga",
+        "required_correct": true
+      }
+    },
+    "timeline_kejadian": {
+      "name": "Timeline Kejadian",
+      "description": "Urutan kronologis kejadian malam hari hingga pagi",
+      "category": "document",
+      "unlock_requirement": {
+        "question_id": "q_logika_waktu",
+        "required_correct": true
+      }
+    },
+    "alibi_penjaga": {
+      "name": "Alibi Penjaga Malam",
+      "description": "Verifikasi penjaga benar-benar di perpustakaan sepanjang malam",
+      "category": "testimony",
+      "unlock_requirement": {
+        "requires_evidence": ["catatan_jam_jaga"]
+      }
+    },
+    "pernyataan_rani_jelas": {
+      "name": "Pernyataan Jelas Rani",
+      "description": "Mahasiswa memberikan penjelasan detail tentang aktivitasnya malam itu",
+      "category": "testimony",
+      "unlock_requirement": {
+        "question_id": "q_logika_waktu",
+        "required_correct": true
+      }    },
+
+    "bukti_perhitungan": {
+      "name": "Nota Pembelian Buku",
+      "description": "Nota dari toko buku yang mencatat pembelian 3 buku sejarah",
+      "category": "document",
+      "unlock_requirement": {
+        "question_id": "q_penjumlahan",
+        "required_correct": true
+      }
+    },
+
+    "bukti_pengurangan": {
+      "name": "Daftar Katalog Buku",
+      "description": "Daftar buku yang sudah dan belum dikatalogkan oleh mahasiswa",
+      "category": "document",
+      "unlock_requirement": {
+        "question_id": "q_pengurangan",
+        "required_correct": true
+      }
+    },
+
+    "bukti_pembagian": {
+      "name": "Foto Halaman Tersebar",
+      "description": "Foto bukti menunjukkan halaman buku yang tersebar di lantai",
+      "category": "physical",
+      "unlock_requirement": {
+        "question_id": "q_pembagian",
+        "required_correct": true
+      }    }
+  },
+  
+  "scenes": {
+    "scene_first_arrival": {
+      "title": "Kedatangan di Perpustakaan",
+      "type": "opening",
+      "description": "Anda tiba di perpustakaan yang terlihat masih dalam kegawatan. Kepala perpustakaan menunggu Anda di pintu masuk.",
+      "conditions": {},
+      "npc_interaction": "kepala_perpustakaan"
+    },
+    "scene_search_main_room": {
+      "title": "Mencari Clue di Ruang Utama",
+      "type": "investigation",
+      "description": "Anda menjelajahi ruang utama perpustakaan...",
+      "conditions": {},
+      "available_actions": ["talk_npc", "search", "examine"]
+    },
+    "scene_archive_first": {
+      "title": "Memasuki Ruang Arsip",
+      "type": "investigation",
+      "description": "Pintu ruang arsip terbuka. Beberapa laci tampak tidak tertutup rapi.",
+      "conditions": {}
+    },
+    "scene_office_search": {
+      "title": "Memeriksa Kantor Kepala",
+      "type": "investigation",
+      "description": "Kantor kepala perpustakaan, tempat meja kerja dan file-file penting.",
+      "conditions": {}
+    }
+  },
+  
+  "endings": [
+    {
+      "id": "checkpoint_success_ending",
+      "type": "brilliant",
+      "title": "🎯 PELAKU TERTANGKAP!",
+      "text": "Berdasarkan kemampuan Anda menjawab pertanyaan matematika dengan sempurna, Anda berhasil mengidentifikasi pola dalam catatan keuangan perpustakaan!\n\nAnda menemukan ketidakcocokan jumlah buku dan dana yang hilang. Analisis mendalam Anda menunjukkan bahwa KEPALA PERPUSTAKAAN adalah pelaku!\n\nDengan bukti yang solid dan logika yang tajam, polisi berhasil menangkap pelaku dan buku kuno yang berharga dapat dikembalikan ke perpustakaan.\n\n🏆 SELAMAT! Anda adalah detektif yang luar biasa cerdas!",
+      "required_evidence": [],
+      "conditions": {
+        "checkpoint_penjumlahan_correct": true,
+        "checkpoint_pengurangan_correct": true
+      },
+      "min_evidence": 0
+    },
+    {
+      "id": "brilliant_ending",
+      "type": "brilliant",
+      "title": "🏆 Detektif Jenius!",
+      "text": "Dengan menggabungkan semua bukti dan analisis logika yang sempurna, Anda berhasil mengungkap:\n\n(Ending akan tergantung pada pilihan dan bukti yang dikumpulkan)\n\nKepala Perpustakaan ternyata yang merancang pencurian untuk mengklaim asuransi buku yang sudah rusak. Bukti dokumen, timeline yang jelas, dan kesadaran akan motif menjadi kunci kesuksesan Anda. Polisi membawa tersangka dan buku itu ditemukan dalam kondisi baik.\n\nAnda telah membuktikan diri sebagai detektif yang benar-benar cemerlang!",
+      "required_evidence": ["catatan_kepala", "catatan_jam_jaga", "timeline_kejadian", "bukti_perhitungan", "bukti_pengurangan", "bukti_pembagian"],
+      "conditions": {
+        "kepala_trust": true,
+        "penjaga_cooperative": true,
+        "rani_opened_up": true,
+        "timeline_established": true,
+        "math_penjumlahan": true,
+        "math_pengurangan": true,
+        "math_pembagian": true
+      },
+      "min_evidence": 7
+    },
+    {
+      "id": "success_ending",
+      "type": "success",
+      "title": "✅ Kasus Terselesaikan",
+      "text": "Anda berhasil mengumpulkan cukup bukti untuk menunjuk pelaku dengan tingkat kepastian yang tinggi. Meskipun tidak sempurna, bukti yang ada cukup untuk investigasi lebih lanjut.\n\nTersangka ditangkap dan dibawa untuk interogasi lebih lanjut. Buku kuno itu berhasil ditemukan.\n\nAnda telah menyelesaikan kasus dengan baik, meskipun masih ada beberapa detail yang belum terjawab.",
+      "required_evidence": ["catatan_kepala", "catatan_jam_jaga"],
+      "conditions": {},
+      "min_evidence": 3,
+      "max_evidence": 3
+    },
+    {
+      "id": "partial_success_ending",
+      "type": "partial_success",
+      "title": "⚖️ Kesuksesan Parsial",
+      "text": "Anda berhasil menemukan beberapa petunjuk, tapi bukti Anda masih tidak cukup meyakinkan. Polisi mengamankan lokasi, tapi tanpa bukti yang kuat, mereka tidak bisa menentukan pelakunya dengan pasti.\n\nKasus ini tetap terbuka, dan kemungkinan pelaku lolos...",
+      "required_evidence": ["catatan_kepala"],
+      "conditions": {},
+      "min_evidence": 1,
+      "max_evidence": 2
+    },
+    {
+      "id": "failure_ending",
+      "type": "failure",
+      "title": "❌ Penyelidikan Gagal",
+      "text": "Anda tidak berhasil mengumpulkan bukti apapun yang berarti. Tanpa bukti konkret, polisi tidak bisa berbuat banyak.\n\nPelaku berhasil lolos. Buku kuno yang berharga itu hilang selamanya. Reputasi Anda sebagai detektif menjadi tercemar.",
+      "required_evidence": [],
+      "conditions": {},
+      "max_evidence": 0
+    }
+  ]
+}
